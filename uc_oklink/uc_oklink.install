@@ -1,0 +1,102 @@
+<?php
+/**
+ * @file
+ *   uc_oklink.install
+ *
+ * Installation file for the Oklink payment module for Ubercart
+ */
+
+
+/**
+ * Implementation of hook_requirements().
+ *
+ * @param $phase
+ *
+ * @return array
+ */
+function uc_oklink_requirements($phase)
+{
+    $t            = get_t();
+    $requirements = array();
+    // BitPay's provided API code requires cURL.
+    $has_curl = function_exists('curl_init');
+    if (variable_get('uc_payment_method_oklink_checkout', FALSE))
+    {
+        $requirements['uc_oklink_curl'] = array(
+            'title' => $t('cURL'),
+            'value' => $has_curl ? $t('Enabled') : $t('Not found'),
+        );
+        if (!$has_curl)
+        {
+            $requirements['uc_oklink_curl']['severity']    = REQUIREMENT_ERROR;
+            $requirements['uc_oklink_curl']['description'] = $t("Oklink requires the PHP <a href = '!curl_url'>cURL</a> library.", array('!curl_url' => 'http://php.net/manual/en/curl.setup.php'));
+        }
+    }
+
+    return $requirements;
+}
+
+
+/**
+ * Implementation of hook_schema().
+ *
+ * @return array
+ */
+function uc_oklink_schema()
+{
+    $schema = array();
+    $schema['uc_payment_oklink'] = array(
+        'description' => 'Stores oklink payment information.',
+        'fields' => array(
+            'button_id' => array(
+                'description' => 'Primary key: the oklink button ID.',
+                'type'        => 'varchar',
+                'length'      => 127,
+                'not null'    => TRUE,
+            ),
+            'order_id' => array(
+                'description' => 'The {uc_orders}.order_id.',
+                'type'        => 'int',
+                'unsigned'    => TRUE,
+                'not null'    => TRUE,
+            ),
+            // NOTE: We're not storing Notification Level (confirm only/full),
+            // Physical Good Indicator, Redirect URL, or Item Description,
+            // all of which should be considered, but not necessarily used.
+            // The buyer-specific data (Name, Address, etc.) won't be considered.
+        ),
+        'indexes' => array(
+            'order_id' => array('order_id'),
+        ),
+        'primary key' => array('button_id')
+    );
+
+    return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ *
+ * Installs the Oklink module; particularly, installs the database
+ * schema and alters orders statuses to include 'Oklink pending'.
+ */
+function uc_oklink_install()
+{
+    // Set the module weight so it can override other modules.
+    db_query("UPDATE {system} SET weight = 99 WHERE name = 'oklink'");
+    // install the schema for the database
+    drupal_install_schema('uc_oklink');
+}
+
+/**
+ * Implementation of hook_uninstall()
+ *
+ * Uninstalls the Oklink module.
+ */
+function uc_oklink_uninstall()
+{
+    // Remove the schema
+    drupal_uninstall_schema('uc_oklink');
+    // Remove relevant data from the DB
+    db_query("DELETE FROM {variable} WHERE name LIKE 'uc_oklink_%%'");
+}
