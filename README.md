@@ -7,7 +7,7 @@ oklink/ubercart-plugin
 
 # Configuration
 
-* Sign up for a merchant account with Bitpay, at [https://www.oklink.com](https://www.oklink.com). Be sure to
+* Sign up for a merchant account with Oklink, at [https://www.oklink.com](https://www.oklink.com). Be sure to
   read all provided information thoroughly.
 * Create an API key and secret at [oklink](https://www.oklink.com/apiKey/index.do "oklink").
 * Under Administer > Site Building > Modules, verify that the Oklink module is
