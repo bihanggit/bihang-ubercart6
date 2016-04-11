@@ -1,9 +1,9 @@
 <?php
 /**
  * @file
- *   uc_oklink.install
+ *   uc_bihang.install
  *
- * Installation file for the Oklink payment module for Ubercart
+ * Installation file for the Bihang payment module for Ubercart
  */
 
 
@@ -14,22 +14,22 @@
  *
  * @return array
  */
-function uc_oklink_requirements($phase)
+function uc_bihang_requirements($phase)
 {
     $t            = get_t();
     $requirements = array();
     // BitPay's provided API code requires cURL.
     $has_curl = function_exists('curl_init');
-    if (variable_get('uc_payment_method_oklink_checkout', FALSE))
+    if (variable_get('uc_payment_method_bihang_checkout', FALSE))
     {
-        $requirements['uc_oklink_curl'] = array(
+        $requirements['uc_bihang_curl'] = array(
             'title' => $t('cURL'),
             'value' => $has_curl ? $t('Enabled') : $t('Not found'),
         );
         if (!$has_curl)
         {
-            $requirements['uc_oklink_curl']['severity']    = REQUIREMENT_ERROR;
-            $requirements['uc_oklink_curl']['description'] = $t("Oklink requires the PHP <a href = '!curl_url'>cURL</a> library.", array('!curl_url' => 'http://php.net/manual/en/curl.setup.php'));
+            $requirements['uc_bihang_curl']['severity']    = REQUIREMENT_ERROR;
+            $requirements['uc_bihang_curl']['description'] = $t("Bihang requires the PHP <a href = '!curl_url'>cURL</a> library.", array('!curl_url' => 'http://php.net/manual/en/curl.setup.php'));
         }
     }
 
@@ -42,14 +42,14 @@ function uc_oklink_requirements($phase)
  *
  * @return array
  */
-function uc_oklink_schema()
+function uc_bihang_schema()
 {
     $schema = array();
-    $schema['uc_payment_oklink'] = array(
-        'description' => 'Stores oklink payment information.',
+    $schema['uc_payment_bihang'] = array(
+        'description' => 'Stores bihang payment information.',
         'fields' => array(
             'button_id' => array(
-                'description' => 'Primary key: the oklink button ID.',
+                'description' => 'Primary key: the bihang button ID.',
                 'type'        => 'varchar',
                 'length'      => 127,
                 'not null'    => TRUE,
@@ -77,26 +77,26 @@ function uc_oklink_schema()
 /**
  * Implementation of hook_install().
  *
- * Installs the Oklink module; particularly, installs the database
- * schema and alters orders statuses to include 'Oklink pending'.
+ * Installs the bihang module; particularly, installs the database
+ * schema and alters orders statuses to include 'bihang pending'.
  */
-function uc_oklink_install()
+function uc_bihang_install()
 {
     // Set the module weight so it can override other modules.
-    db_query("UPDATE {system} SET weight = 99 WHERE name = 'oklink'");
+    db_query("UPDATE {system} SET weight = 99 WHERE name = 'bihang'");
     // install the schema for the database
-    drupal_install_schema('uc_oklink');
+    drupal_install_schema('uc_bihang');
 }
 
 /**
  * Implementation of hook_uninstall()
  *
- * Uninstalls the Oklink module.
+ * Uninstalls the bihang module.
  */
-function uc_oklink_uninstall()
+function uc_bihang_uninstall()
 {
     // Remove the schema
-    drupal_uninstall_schema('uc_oklink');
+    drupal_uninstall_schema('uc_bihang');
     // Remove relevant data from the DB
-    db_query("DELETE FROM {variable} WHERE name LIKE 'uc_oklink_%%'");
+    db_query("DELETE FROM {variable} WHERE name LIKE 'uc_bihang_%%'");
 }
